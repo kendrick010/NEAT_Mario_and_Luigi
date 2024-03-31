@@ -28,7 +28,6 @@ def detect_leave(frame, threshold=0.98):
     
     return frame
 
-
 def get_contours(frame, lower_color, upper_color):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
