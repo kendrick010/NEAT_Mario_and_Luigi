@@ -14,3 +14,17 @@ Theoretically this should work as the time elapsed should account for the window
 Goal: https://www.youtube.com/watch?v=3LJ9qQpR4jI&ab_channel=Migu
 
 use `pyautogui.sleep(0.01)` for registering holds/presses
+
+dont constantly check for entering characters, have two states, `entered_edge` and `passed_edge`.
+
+- `entered_edge==False` and `passed_eddge==False`: dont do anything
+- `entered_edge==True` and `passed_eddge==False`: wait for last frame until character fully in screen
+- `entered_edge==True` and `passed_eddge==True`: scan for character and mark everything false
+
+ --------
+| X |    |
+| X |    |
+| X |    |
+ --------
+
+note: you dont need to constantly check for both, it works one at a time until both are true
