@@ -1,0 +1,28 @@
+{
+    "gameScreenOffsetX": 400,
+    "gameScreenOffsetY": 0,
+    "gameScreenWidth": 1760,
+    "gameScreenHeight": 1440,
+
+    "characterRoiX": 5,
+    "characterRoiY": 640,
+    "characterRoiWidth": 50,
+    "characterRoiHeight": 75,
+    
+    "leavingRoiX": 80,
+    "leavingRoiY": 395,
+    "leavingRoiWidth": 75,
+    "leavingRoiHeight": 25,
+
+    "upKey": "up",
+    "downKey": "down",
+    "rightKey": "right",
+    "leftKey": "left",
+
+    "aKey": "D",
+    "bKey": "S",
+    "xKey": "W",
+    "yKey": "A",
+
+    "recordVideo": false
+}

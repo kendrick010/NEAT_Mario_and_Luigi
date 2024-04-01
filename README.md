@@ -21,10 +21,12 @@ dont constantly check for entering characters, have two states, `entered_edge` a
 - `entered_edge==True` and `passed_eddge==False`: wait for last frame until character fully in screen
 - `entered_edge==True` and `passed_eddge==True`: scan for character and mark everything false
 
+Roi:
+
  --------
 | X |    |
 | X |    |
 | X |    |
  --------
 
-note: you dont need to constantly check for both, it works one at a time until both are true
+note: you dont need to constantly check for both, it works one at a time until both are true. the Xs are the gutter or edge.

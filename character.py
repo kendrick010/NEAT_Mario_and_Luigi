@@ -5,3 +5,4 @@ class Character(Enum):
     LUIGI = 2
     BABY_MARIO = 3
     BABY_LUIGI = 4
+    NOTHING = 5

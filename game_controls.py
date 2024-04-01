@@ -1,34 +1,18 @@
 import pygetwindow as gw
 import pyautogui
-import time
+import threading
 
-DESUME = "DeSmuME"
+from properties import *
 
-UP_KEY = "up"
-DOWN_KEY = 'down'
-RIGHT_KEY = 'right'
-LEFT_KEY = 'left'
-B_KEY = 'S'
-A_KEY = 'D'
-Y_KEY = 'A'
-X_KEY = 'W'
-
-def game_input(input_key):
+def mimic_press(input_key):
 	# Mimic a press, add delay to detect and register
 	pyautogui.keyDown(input_key)
-	time.sleep(0.05)
+	pyautogui.sleep(0.1)
 	pyautogui.keyUp(input_key)
 
-def start_combo():
-	# Open DeSmuME
-	window_title = [title for title in gw.getAllTitles() if DESUME in title][0]
-	game_window = gw.getWindowsWithTitle(window_title)[0]
-	game_window.activate()
-	
+def game_input(input_key):
+	threading.Thread(target=mimic_press, args=(input_key,)).start()
+
+def start_combo():	
 	game_input('f1')
 	game_input(B_KEY)
-	game_input(B_KEY)
-	game_input(B_KEY)
-	game_input(B_KEY)
-	
-	time.sleep(3)
