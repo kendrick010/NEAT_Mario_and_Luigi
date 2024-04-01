@@ -4,7 +4,7 @@ Note to self: Been mostly f-ing around with cv, and i think i have been mostly o
 
 Inputs:
 - Time elapsed since combo
-- Fixed-length queue of seen characters entering (length will as long as many characters can fit on screen and "zero" padded)
+- Fixed-length queue of seen characters entering (length will as long as many characters can fit on screen and "zero" padded, tho it looks like max the number of entering characters at higher combo strings is ~3)
 
 Outputs:
 - What button to press (A, B, X, Y, or none)
