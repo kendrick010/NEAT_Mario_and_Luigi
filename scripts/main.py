@@ -52,9 +52,6 @@ def init(roi_validate=True):
 	frame = get_frame(bbox)
 	set_roi_backdrop(frame)
 
-	# Init character queue
-	CHARACTER_QUEUE.push(item=Character.EMPTY, priority=2)
-
 if __name__ == "__main__":
 	init()
 

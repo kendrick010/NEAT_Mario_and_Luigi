@@ -17,8 +17,6 @@ LOWER_RED = np.array([0, 100, 100])
 UPPER_RED = np.array([10, 255, 255])
 LOWER_GREEN = np.array([50, 100, 100])
 UPPER_GREEN = np.array([70, 255, 255])
-LOWER_BLUE = np.array([100, 100, 0])
-UPPER_BLUE = np.array([255, 255, 10])
 
 def set_roi_backdrop(frame):
 	global EDGE_BACKDROP
@@ -113,6 +111,9 @@ def update_leaving_state(character_queue, frame):
 	else: LEAVING_STATE = False
 	
 	return character_queue
+
+def check_failure_state(frame):
+	# TODO....
 
 def update_states(frame, character_queue):
 	character_roi = get_entering_character_roi(frame)
