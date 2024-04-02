@@ -1,11 +1,11 @@
 {
-    "gameScreenOffsetX": 400,
-    "gameScreenOffsetY": 0,
-    "gameScreenWidth": 1760,
-    "gameScreenHeight": 1440,
+    "gameScreenOffsetX": 8,
+    "gameScreenOffsetY": 80,
+    "gameScreenWidth": 512,
+    "gameScreenHeight": 768,
 
-    "characterRoiX": 5,
-    "characterRoiY": 640,
+    "characterRoiX": 0,
+    "characterRoiY": 565,
     "characterRoiWidth": 50,
     "characterRoiHeight": 75,
     

@@ -1,5 +1,4 @@
 import json
-import os
 
 EMULATOR = "DeSmuME"
 
@@ -25,9 +24,6 @@ def load(filename="properties.json"):
     global UP_KEY, DOWN_KEY, RIGHT_KEY, LEFT_KEY
     global A_KEY, B_KEY, X_KEY, Y_KEY
     global RECORD_VIDEO
-    
-    local_dir = os.path.dirname(__file__)
-    filename = os.path.join(local_dir, filename)
     
     # I know it's messy
     with open(filename, "r") as property_file:
