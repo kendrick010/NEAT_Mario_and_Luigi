@@ -8,8 +8,9 @@ from properties import *
 EDGE_WIDTH = 1
 EDGE_BACKDROP = 0
 
-# Character entering states
+# Character entering/leaving states
 ENTERED_EDGE_STATE = False
+LEAVING_STATE = False
 
 # Predefined BGR color thresholds
 LOWER_RED = np.array([0, 100, 100])
@@ -30,6 +31,12 @@ def set_roi_backdrop(frame):
 def get_entering_character_roi(frame):
 	roi = frame[ENTERING_ROI["y_pos"]:ENTERING_ROI["y_pos"]+ENTERING_ROI["height"],
 			 ENTERING_ROI["x_pos"]:ENTERING_ROI["x_pos"]+ENTERING_ROI["width"]]
+	
+	return roi
+
+def get_leaving_character_roi(frame):
+	roi = frame[LEAVING_ROI["y_pos"]:LEAVING_ROI["y_pos"]+LEAVING_ROI["height"],
+			 LEAVING_ROI["x_pos"]:LEAVING_ROI["x_pos"]+LEAVING_ROI["width"]]
 	
 	return roi
 
@@ -87,13 +94,32 @@ def update_entering_state(character_queue, character_roi):
 	elif np.array_equal(EDGE_BACKDROP, edge_roi) and True == ENTERED_EDGE_STATE:
 		ENTERED_EDGE_STATE = False
 		detected_character = detect_character(character_roi)
-		character_queue.push(item=detect_character, priority=1)
+		character_queue.push(item=detected_character, priority=1)
 
 	return character_queue
 
-		
+def update_leaving_state(character_queue, frame):
+	global LEAVING_STATE
 
+	leaving_roi = get_leaving_character_roi(frame)
+	mask, _ = filter_mario_luigi(leaving_roi)
+	leaving_roi = cv2.bitwise_and(leaving_roi, leaving_roi, mask=mask)
 
+	# Acts like a debounce
+	if np.any(leaving_roi) and False == LEAVING_STATE:
+		LEAVING_STATE = True
+		character_queue.pop()
+
+	else: LEAVING_STATE = False
+	
+	return character_queue
+
+def update_states(frame, character_queue):
+	character_roi = get_entering_character_roi(frame)
+	character_queue = update_entering_state(character_roi)
+	character_queue = update_leaving_state(frame)
+
+	return character_queue
 
 # load()
 

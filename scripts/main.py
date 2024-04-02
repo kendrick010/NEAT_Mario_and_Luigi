@@ -11,9 +11,6 @@ from priority_queue import FixedLengthPriorityQueue
 from character import Character
 from properties import *
 
-# Max possibele number of marios and luigis can appear in one frame is about 3-4 on higher speeds
-CHARACTER_QUEUE = FixedLengthPriorityQueue(max_length=4)
-
 def get_frame(bbox):
 	frame = np.array(pyautogui.screenshot(region=bbox))
 				  
@@ -60,3 +57,6 @@ def init(roi_validate=True):
 
 if __name__ == "__main__":
 	init()
+
+	# Max possibele number of marios and luigis can appear in one frame is about 3-4 on higher speeds
+	CHARACTER_QUEUE = FixedLengthPriorityQueue(max_length=4)

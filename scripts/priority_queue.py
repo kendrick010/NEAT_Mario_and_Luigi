@@ -14,3 +14,6 @@ class FixedLengthPriorityQueue:
     def pop(self):
         _, item = heapq.heappop(self.heap)
         return item
+    
+    def __repr__(self):
+        return f"{self.heap}"
