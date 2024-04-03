@@ -5,13 +5,13 @@ import cv2
 import numpy as np
 
 from properties import load
-from game_controls import game_input, start_combo
-from game_states import set_roi_backdrop
-from priority_queue import FixedLengthPriorityQueue
-from character import Character
+from game_controls import start_combo, game_input
+from game_states import update_states
+from fixed_queue import FixedQueue
 from properties import *
 
-def get_frame(bbox):
+def get_frame():
+	bbox = GAME_WINDOW["x_pos"], GAME_WINDOW["y_pos"], GAME_WINDOW["width"], GAME_WINDOW["height"]
 	frame = np.array(pyautogui.screenshot(region=bbox))
 				  
 	return frame
@@ -31,29 +31,38 @@ def init(roi_validate=True):
 	GAME_WINDOW["x_pos"] = GAME_WINDOW_OFFSET["x_offset"] + window.left
 	GAME_WINDOW["y_pos"] = GAME_WINDOW_OFFSET["y_offset"] + window.top
 
-	bbox = GAME_WINDOW["x_pos"], GAME_WINDOW["y_pos"], GAME_WINDOW["width"], GAME_WINDOW["height"]
+	# Validate cv boxes if entering and leaving roi are correct
+	if roi_validate:
+		validate1 = cv2.imread("assets/baby_mario.png")
+		validate2 = cv2.imread("assets/mario.png")
 
-	# Validate if entering and leaving roi are correct
-	# if roi_validate:
+		cv2.rectangle(validate1, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (0, 255, 0), 2)
+		cv2.rectangle(validate1, (LEAVING_ROI["x_pos"], LEAVING_ROI["y_pos"]), (LEAVING_ROI["x_pos"]+LEAVING_ROI["width"], LEAVING_ROI["y_pos"]+LEAVING_ROI["height"]), (255, 0, 0), 2)
+		cv2.rectangle(validate2, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (0, 255, 0), 2)
+		cv2.rectangle(validate2, (LEAVING_ROI["x_pos"], LEAVING_ROI["y_pos"]), (LEAVING_ROI["x_pos"]+LEAVING_ROI["width"], LEAVING_ROI["y_pos"]+LEAVING_ROI["height"]), (255, 0, 0), 2)
 
-	# 	cv2.imshow("Entering Luigi", cv2.cvtColor(np.array(pyautogui.screenshot(region=bbox)), cv2.COLOR_BGR2RGB))
-	# 	cv2.waitKey(0)
-	# 	# cv2.imshow("Entering Baby Luigi", "assets/baby_luigi.png")
-	# 	# cv2.imshow("Leaving", "assets/empty.png")
+		cv2.imshow("Validation 1", validate1)
+		cv2.imshow("Validation 2", validate2)
 
+		# Prompt the user for confirmation
+		if pyautogui.confirm(text="Proceed?", title="Roi Validation Check", buttons=("Yes", "No")) != "Yes":
+			cv2.destroyAllWindows() 
+			sys.exit("Validation failed")
 
-	# 	# if pyautogui.confirm(text="Proceed?", title="Roi Validation Check", buttons=("Yes", "No")) != "Yes":
-	# 	# 	cv2.destroyAllWindows() 
-	# 	# 	sys.exit("Validation failed")
+		cv2.destroyAllWindows() 
 
-	# 	cv2.destroyAllWindows() 
+def run_copy_flower():
+	pass
 
-	# A small background frame, to compare pixel difference amd check for state changes
-	frame = get_frame(bbox)
-	set_roi_backdrop(frame)
+def eval_genomes():
+	pass
+
+def run_neat():
+	pass
+
+def exit():
+	pass
 
 if __name__ == "__main__":
 	init()
-
-	# Max possibele number of marios and luigis can appear in one frame is about 3-4 on higher speeds
-	CHARACTER_QUEUE = FixedLengthPriorityQueue(max_length=4)
+	run_neat()

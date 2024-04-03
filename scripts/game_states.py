@@ -1,15 +1,13 @@
 import cv2
 import numpy as np
+from collections import Counter
 
 from character import Character
 from properties import *
 
-# A small background frame, any pixel difference means a change in state
-EDGE_WIDTH = 1
-EDGE_BACKDROP = 0
-
 # Character entering/leaving states
-ENTERED_EDGE_STATE = False
+CHARACTER_CACHE = []
+LAST_ENTERED = 0
 LEAVING_STATE = False
 
 # Predefined BGR color thresholds
@@ -17,14 +15,6 @@ LOWER_RED = np.array([0, 100, 100])
 UPPER_RED = np.array([10, 255, 255])
 LOWER_GREEN = np.array([50, 100, 100])
 UPPER_GREEN = np.array([70, 255, 255])
-
-def set_roi_backdrop(frame):
-	global EDGE_BACKDROP
-
-	roi = frame[ENTERING_ROI["y_pos"]:ENTERING_ROI["y_pos"]+ENTERING_ROI["height"],
-			 ENTERING_ROI["x_pos"]:ENTERING_ROI["x_pos"]+EDGE_WIDTH]
-	
-	EDGE_BACKDROP = roi
 
 def get_entering_character_roi(frame):
 	roi = frame[ENTERING_ROI["y_pos"]:ENTERING_ROI["y_pos"]+ENTERING_ROI["height"],
@@ -81,25 +71,27 @@ def detect_character(character_roi, red_percent_threshold=0.13, green_percent_th
 	else:
 		return Character.LUIGI
 
-def update_entering_state(character_queue, character_roi):
-	global ENTERED_EDGE_STATE
+def update_entering_state(character_roi, character_queue):
+	global CHARACTER_CACHE
 
-	edge_roi = character_roi[:, :EDGE_WIDTH]
+	character_roi = cv2.cvtColor(character_roi, cv2.COLOR_BGR2RGB)
+	found_character = detect_character(character_roi)
 
-	if not np.array_equal(EDGE_BACKDROP, edge_roi) and False == ENTERED_EDGE_STATE: 
-		ENTERED_EDGE_STATE = True
+	if Character.EMPTY != found_character:
+		CHARACTER_CACHE.append(found_character)
 
-	elif np.array_equal(EDGE_BACKDROP, edge_roi) and True == ENTERED_EDGE_STATE:
-		ENTERED_EDGE_STATE = False
-		detected_character = detect_character(character_roi)
-		character_queue.push(item=detected_character, priority=1)
+	elif CHARACTER_CACHE and Character.EMPTY == found_character:
+		frequencies = Counter(CHARACTER_CACHE)
+		front_character = max(frequencies, key=frequencies.get)
+
+		character_queue.push(front_character)
+		CHARACTER_CACHE.clear()
 
 	return character_queue
 
-def update_leaving_state(character_queue, frame):
+def update_leaving_state(leaving_roi, character_queue):
 	global LEAVING_STATE
 
-	leaving_roi = get_leaving_character_roi(frame)
 	mask, _ = filter_mario_luigi(leaving_roi)
 	leaving_roi = cv2.bitwise_and(leaving_roi, leaving_roi, mask=mask)
 
@@ -108,19 +100,34 @@ def update_leaving_state(character_queue, frame):
 		LEAVING_STATE = True
 		character_queue.pop()
 
-	else: LEAVING_STATE = False
+		print('left')
+
+	elif not np.any(leaving_roi) and True == LEAVING_STATE: 
+		LEAVING_STATE = False
 	
 	return character_queue
 
-def check_failure_state(frame):
-	# TODO....
+def check_failure_state(frame, percent_threshold=0.05):
+	leaving_roi = get_leaving_character_roi(frame)
+	hsv = cv2.cvtColor(leaving_roi, cv2.COLOR_BGR2HSV)
+
+	mask = cv2.inRange(hsv, LOWER_RED, UPPER_RED)
+	menu_percent = cv2.countNonZero(mask) / (LEAVING_ROI["width"] * LEAVING_ROI["height"])
+
+	if menu_percent > percent_threshold: return True
+
+	return False
 
 def update_states(frame, character_queue):
 	character_roi = get_entering_character_roi(frame)
-	character_queue = update_entering_state(character_roi)
-	character_queue = update_leaving_state(frame)
+	character_queue = update_entering_state(character_roi, character_queue)
+
+	leaving_roi = get_leaving_character_roi(frame)
+	character_queue = update_leaving_state(leaving_roi, character_queue)
 
 	return character_queue
+
+
 
 # load()
 
@@ -128,10 +135,11 @@ def update_states(frame, character_queue):
 
 # image = cv2.imread('assets/luigi.png')
 # cv2.rectangle(image, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (0, 255, 0), 2)
-# cv2.rectangle(image, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+thin_width, ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (255, 0, 0), 2)
-# cv2.rectangle(image, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+35), (255, 0, 0), 2)
+# cv2.rectangle(image, (LEAVING_ROI["x_pos"], LEAVING_ROI["y_pos"]), (LEAVING_ROI["x_pos"]+LEAVING_ROI["width"], LEAVING_ROI["y_pos"]+LEAVING_ROI["height"]), (255, 0, 0), 2)
 
 # image = get_entering_character_roi(image)
+# from priority_queue import FixedLengthPriorityQueue
+# CHARACTER_QUEUE = FixedLengthPriorityQueue(max_length=4)
 # print(detect_character(image))
 
 # cv2.imshow("Image", image)

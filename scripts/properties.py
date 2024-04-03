@@ -7,7 +7,9 @@ GAME_WINDOW_OFFSET = {"x_offset": 0, "y_offset": 0}
 
 ENTERING_ROI = {"x_pos": 0, "y_pos": 0, "width": 0, "height": 0}
 LEAVING_ROI = {"x_pos": 0, "y_pos": 0, "width": 0, "height": 0}
+LEAVING_FREQ = 0
 
+RESET_KEY = "f3"
 UP_KEY = "up"
 DOWN_KEY = "down"
 RIGHT_KEY = "right"
@@ -23,7 +25,7 @@ def load(filename="properties.json"):
     global GAME_WINDOW, ENTERING_ROI, LEAVING_ROI, RECORD_VIDEO
     global UP_KEY, DOWN_KEY, RIGHT_KEY, LEFT_KEY
     global A_KEY, B_KEY, X_KEY, Y_KEY
-    global RECORD_VIDEO
+    global LEAVING_FREQ, RECORD_VIDEO
     
     # I know it's messy
     with open(filename, "r") as property_file:
@@ -43,6 +45,8 @@ def load(filename="properties.json"):
         LEAVING_ROI["y_pos"] = attributes["leavingRoiY"]
         LEAVING_ROI["width"] = attributes["leavingRoiWidth"]
         LEAVING_ROI["height"] = attributes["leavingRoiHeight"]
+
+        LEAVING_FREQ = attributes["leavingLambdaFreq"]
 
         UP_KEY = attributes["upKey"]
         DOWN_KEY = attributes["downKey"]

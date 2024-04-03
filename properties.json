@@ -9,10 +9,12 @@
     "characterRoiWidth": 50,
     "characterRoiHeight": 75,
     
-    "leavingRoiX": 80,
-    "leavingRoiY": 395,
+    "leavingRoiX": 436,
+    "leavingRoiY": 383,
     "leavingRoiWidth": 75,
     "leavingRoiHeight": 25,
+
+    "leavingLambdaFreq": 1.5,
 
     "upKey": "up",
     "downKey": "down",
