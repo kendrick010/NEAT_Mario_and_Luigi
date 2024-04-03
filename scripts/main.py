@@ -6,11 +6,13 @@ import numpy as np
 import neat
 import pickle
 import os
+import time
 
 from properties import load
 from game_controls import start_combo, game_input
-from game_states import update_states
+from game_states import update_states, check_failure_state
 from fixed_queue import FixedQueue
+from character import Character
 from properties import *
 
 def get_frame():
@@ -56,11 +58,43 @@ def init(roi_validate=True):
 
 		cv2.destroyAllWindows() 
 
-def run_copy_flower():
-	pass
+def predict(net, character_queue, timestamp):
+	inputs = character_queue.queue
+	if character_queue.max_size > len(inputs):
+		inputs += (character_queue.max_size - len(inputs)) * [Character.EMPTY]
 
-def eval_genomes():
-	pass
+	output = net.activate(*inputs, timestamp)
+	decision = output.index(max(output))
+
+	if 1 == decision:
+		game_input(A_KEY)
+
+	elif 2 == decision:
+		game_input(B_KEY)
+
+	elif 3 == decision:
+		game_input(X_KEY)
+
+	elif 4 == decision:
+		game_input(Y_KEY)
+
+def run_copy_flower(genome, config):
+	character_queue = FixedQueue(max_size=4)
+	net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+	frame = get_frame()
+	duration = time.time()
+	while check_failure_state(frame): 
+		frame = get_frame()
+		character_queue = update_states(frame, character_queue)
+		predict(net, character_queue, time.time())
+
+	genome.fitness = time.time() - duration
+
+def eval_genomes(genomes, config):
+	for (genome_id, genome) in genomes:
+		genome.fitness = 0
+		run_copy_flower(genome, config)
 
 def run_neat(config, generations=50, run_last_checkpoint=False):
 	checkpoints_dir = "checkpoints"
