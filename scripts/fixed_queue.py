@@ -21,6 +21,3 @@ class FixedQueue:
     def __repr__(self):
         # Return the list of items in the queue
         return f"{self.queue}"
-    
-    def __len__(self):
-        return len(self.queue)

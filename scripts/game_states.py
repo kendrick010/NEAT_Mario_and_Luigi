@@ -129,9 +129,7 @@ def update_states(frame, character_queue):
 
 
 
-# load()
 
-# thin_width = 1
 
 # image = cv2.imread('assets/luigi.png')
 # cv2.rectangle(image, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (0, 255, 0), 2)
@@ -142,7 +140,20 @@ def update_states(frame, character_queue):
 # CHARACTER_QUEUE = FixedLengthPriorityQueue(max_length=4)
 # print(detect_character(image))
 
-# cv2.imshow("Image", image)
+	# Open DeSmuME
+# window_title = [title for title in gw.getAllTitles() if EMULATOR in title][0]
+# window = gw.getWindowsWithTitle(window_title)[0]
+# window.activate()	
+# pyautogui.sleep(1)
+# window = gw.getActiveWindow()
+
+# GAME_WINDOW["x_pos"] = GAME_WINDOW_OFFSET["x_offset"] + window.left
+# GAME_WINDOW["y_pos"] = GAME_WINDOW_OFFSET["y_offset"] + window.top
+
+# frame = get_frame()
+# print(check_failure_state(frame))
+
+# cv2.imshow("Image", frame)
 # cv2.waitKey(0)  # Wait for any key press
 # cv2.destroyAllWindows()  # Close all OpenCV windows
 

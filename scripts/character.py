@@ -6,9 +6,3 @@ class Character(Enum):
     BABY_MARIO = 3
     BABY_LUIGI = 4
     EMPTY = 5
-
-    def __lt__(self, other):
-        if self == Character.EMPTY or other == Character.EMPTY:
-            return False
-        
-        return True

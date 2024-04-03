@@ -7,13 +7,17 @@ import neat
 import pickle
 import os
 import time
+import threading
 
 from properties import load
-from game_controls import start_combo, game_input
+from game_controls import start_combo, game_input, game_input_listener
 from game_states import update_states, check_failure_state
 from fixed_queue import FixedQueue
 from character import Character
 from properties import *
+
+event_thread = threading.Thread(target=game_input_listener)
+event_thread.start()
 
 def get_frame():
 	bbox = GAME_WINDOW["x_pos"], GAME_WINDOW["y_pos"], GAME_WINDOW["width"], GAME_WINDOW["height"]
@@ -38,10 +42,8 @@ def init(roi_validate=True):
 
 	# Validate cv boxes if entering and leaving roi are correct
 	if roi_validate:
-		local_dir = os.path.dirname(__file__)
-
-		validate1 = cv2.imread(os.path.join(local_dir, "mario.png"))
-		validate2 = cv2.imread(os.path.join(local_dir, "baby_mario.png"))
+		validate1 = cv2.imread("assets/mario.png")
+		validate2 = cv2.imread("assets/baby_mario.png")
 
 		cv2.rectangle(validate1, (ENTERING_ROI["x_pos"], ENTERING_ROI["y_pos"]), (ENTERING_ROI["x_pos"]+ENTERING_ROI["width"], ENTERING_ROI["y_pos"]+ENTERING_ROI["height"]), (0, 255, 0), 2)
 		cv2.rectangle(validate1, (LEAVING_ROI["x_pos"], LEAVING_ROI["y_pos"]), (LEAVING_ROI["x_pos"]+LEAVING_ROI["width"], LEAVING_ROI["y_pos"]+LEAVING_ROI["height"]), (255, 0, 0), 2)
@@ -54,7 +56,7 @@ def init(roi_validate=True):
 		# Prompt the user for confirmation
 		if pyautogui.confirm(text="Proceed?", title="Roi Validation Check", buttons=("Yes", "No")) != "Yes":
 			cv2.destroyAllWindows() 
-			sys.exit("Validation failed")
+			sys.exit()
 
 		cv2.destroyAllWindows() 
 
@@ -63,7 +65,8 @@ def predict(net, character_queue, timestamp):
 	if character_queue.max_size > len(inputs):
 		inputs += (character_queue.max_size - len(inputs)) * [Character.EMPTY]
 
-	output = net.activate(*inputs, timestamp)
+	inputs_enum = [character.value for character in inputs]
+	output = net.activate((*inputs_enum, timestamp))
 	decision = output.index(max(output))
 
 	if 1 == decision:
@@ -82,12 +85,15 @@ def run_copy_flower(genome, config):
 	character_queue = FixedQueue(max_size=4)
 	net = neat.nn.FeedForwardNetwork.create(genome, config)
 
+	start_combo()
+	time.sleep(2.5)
+
 	frame = get_frame()
 	duration = time.time()
-	while check_failure_state(frame): 
-		frame = get_frame()
+	while not check_failure_state(frame):
 		character_queue = update_states(frame, character_queue)
 		predict(net, character_queue, time.time())
+		frame = get_frame()
 
 	genome.fitness = time.time() - duration
 
@@ -121,11 +127,10 @@ def run_neat(config, generations=50, run_last_checkpoint=False):
 		pickle.dump(winner, f)
 
 def end():
-	pass
+	sys.exit()
 
 if __name__ == "__main__":
-	local_dir = os.path.dirname(__file__)
-	config_path = os.path.join(local_dir, "config.txt")
+	config_path = "config.txt"
 
 	config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
 						 neat.DefaultSpeciesSet, neat.DefaultStagnation,
