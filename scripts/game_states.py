@@ -1,14 +1,13 @@
 import cv2
 import numpy as np
 from collections import Counter
+import time
 
 from character import Character
-from game_controls import READING
 from properties import *
 
 # Character entering/leaving states
 CHARACTER_CACHE = []
-LAST_ENTERED = 0
 LEAVING_STATE = False
 
 # Predefined BGR color thresholds
@@ -97,31 +96,21 @@ def update_leaving_state(leaving_roi, character_queue):
 	leaving_roi = cv2.bitwise_and(leaving_roi, leaving_roi, mask=mask)
 
 	# Acts like a debounce
+	left = False
 	if np.any(leaving_roi) and False == LEAVING_STATE:
 		LEAVING_STATE = True
 		character_queue.pop()
+		left = True
 
 	elif not np.any(leaving_roi) and True == LEAVING_STATE: 
 		LEAVING_STATE = False
 	
-	return character_queue
+	return character_queue, left
 
-def check_failure_state(frame, percent_threshold=0.05):
-	global READING
-
-	# Pause inputs to decouple failure state checks from nn output presses
-	READING = True
-
-	leaving_roi = get_leaving_character_roi(frame)
-	hsv = cv2.cvtColor(leaving_roi, cv2.COLOR_BGR2HSV)
-
-	mask = cv2.inRange(hsv, LOWER_RED, UPPER_RED)
-	menu_percent = cv2.countNonZero(mask) / (LEAVING_ROI["width"] * LEAVING_ROI["height"])
-
-	if menu_percent > percent_threshold: return True
-
-	# Unpause
-	READING = False
+def check_failure_state(character_queue):	
+	if character_queue.queue:
+		_, leading_character_timestamp = character_queue.peek()
+		if (time.time() - leading_character_timestamp) > LEAVING_FREQ: return True
 	
 	return False
 
@@ -130,9 +119,9 @@ def update_states(frame, character_queue):
 	character_queue = update_entering_state(character_roi, character_queue)
 
 	leaving_roi = get_leaving_character_roi(frame)
-	character_queue = update_leaving_state(leaving_roi, character_queue)
+	character_queue, left = update_leaving_state(leaving_roi, character_queue)
 
-	return character_queue
+	return character_queue, left
 
 
 

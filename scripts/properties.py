@@ -1,5 +1,4 @@
 import json
-import os
 
 EMULATOR = "DeSmuME"
 
@@ -8,7 +7,7 @@ GAME_WINDOW_OFFSET = {"x_offset": 0, "y_offset": 0}
 
 ENTERING_ROI = {"x_pos": 0, "y_pos": 0, "width": 0, "height": 0}
 LEAVING_ROI = {"x_pos": 0, "y_pos": 0, "width": 0, "height": 0}
-LEAVING_FREQ = 0
+LEAVING_FREQ = 3.0
 
 RESET_KEY = "f3"
 UP_KEY = "up"

@@ -10,7 +10,7 @@ INPUT_KEY = None
 def mimic_press(input_key):
 	# Mimic a press, add delay to detect and register
 	pyautogui.keyDown(input_key)
-	pyautogui.sleep(0.1)
+	pyautogui.sleep(0.05)
 	pyautogui.keyUp(input_key)
 
 def game_input_listener():
