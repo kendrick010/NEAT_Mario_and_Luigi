@@ -14,7 +14,7 @@
     "leavingRoiWidth": 75,
     "leavingRoiHeight": 25,
 
-    "leavingLambdaFreq": 1.5,
+    "leavingLambdaFreq": 3,
 
     "upKey": "up",
     "downKey": "down",

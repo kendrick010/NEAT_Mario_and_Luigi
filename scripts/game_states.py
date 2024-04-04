@@ -3,6 +3,7 @@ import numpy as np
 from collections import Counter
 
 from character import Character
+from game_controls import READING
 from properties import *
 
 # Character entering/leaving states
@@ -100,14 +101,17 @@ def update_leaving_state(leaving_roi, character_queue):
 		LEAVING_STATE = True
 		character_queue.pop()
 
-		print('left')
-
 	elif not np.any(leaving_roi) and True == LEAVING_STATE: 
 		LEAVING_STATE = False
 	
 	return character_queue
 
 def check_failure_state(frame, percent_threshold=0.05):
+	global READING
+
+	# Pause inputs to decouple failure state checks from nn output presses
+	READING = True
+
 	leaving_roi = get_leaving_character_roi(frame)
 	hsv = cv2.cvtColor(leaving_roi, cv2.COLOR_BGR2HSV)
 
@@ -116,6 +120,9 @@ def check_failure_state(frame, percent_threshold=0.05):
 
 	if menu_percent > percent_threshold: return True
 
+	# Unpause
+	READING = False
+	
 	return False
 
 def update_states(frame, character_queue):

@@ -7,17 +7,13 @@ import neat
 import pickle
 import os
 import time
-import threading
 
 from properties import load
-from game_controls import start_combo, game_input, game_input_listener
 from game_states import update_states, check_failure_state
 from fixed_queue import FixedQueue
 from character import Character
+from game_controls import *
 from properties import *
-
-event_thread = threading.Thread(target=game_input_listener)
-event_thread.start()
 
 def get_frame():
 	bbox = GAME_WINDOW["x_pos"], GAME_WINDOW["y_pos"], GAME_WINDOW["width"], GAME_WINDOW["height"]
@@ -70,16 +66,16 @@ def predict(net, character_queue, timestamp):
 	decision = output.index(max(output))
 
 	if 1 == decision:
-		game_input(A_KEY)
-
-	elif 2 == decision:
-		game_input(B_KEY)
-
-	elif 3 == decision:
 		game_input(X_KEY)
 
-	elif 4 == decision:
+	elif 2 == decision:
 		game_input(Y_KEY)
+
+	elif 3 == decision:
+		game_input(A_KEY)
+
+	elif 4 == decision:
+		game_input(B_KEY)
 
 def run_copy_flower(genome, config):
 	character_queue = FixedQueue(max_size=4)
