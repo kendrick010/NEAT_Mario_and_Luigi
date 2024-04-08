@@ -1,32 +1,25 @@
 # NEAT_Mario_and_Luigi
 
-Note to self: Been mostly f-ing around with cv, and i think i have been mostly overcomplicating the bare bones solution for the inputs required for the net.
+This project implements a NEAT (NeuroEvolution of Augmenting Topologies) algorithm to play the game, Mario and Luigi: Partners In Time. Its task is specifically hard-coded to perfect the game's "copy flower" item where incoming Mario, Luigi, Baby Mario, or Baby Luigi (abbreviated to `MLBMBL` for the rest of the `README.md`) sprites run and jump on the enemy. The agent must press the corresponding button for each `MLBMBL` sprite at a precise window of time. The timing/difficulty window is made to increase for every successful button command. 
 
-Inputs:
-- Time elapsed since combo
-- Fixed-length queue of seen characters entering (length will as long as many characters can fit on screen and "zero" padded, tho it looks like max the number of entering characters at higher combo strings is ~3)
+[A speedrun example.](https://www.youtube.com/watch?v=3LJ9qQpR4jI&ab_channel=Migu)
 
-Outputs:
-- What button to press (A, B, X, Y, or none)
+## Project Overview
 
-Theoretically this should work as the time elapsed should account for the window of time difficulty to pressing the right button for the combo. It could reasonably be correlated to the distance away from the boss. As of the character queue, this gives information to learn what button to press for each character.
+NEAT is a genetic algorithm-based technique for evolving neural networks, similarly inspired by human evolution or natural selection. A NEAT algorithm starts with a population of very simple neural networks. Each neural network in the population is evaluated on a task, and the performance of each network is assessed based on some predefined criteria called the fitness. After one training iteration or generation of this population, the best networks or the "most fit" are chosen to crossover and mutate a new neural network for the next generation. This entire process iterates for X generations.
 
-Goal: https://www.youtube.com/watch?v=3LJ9qQpR4jI&ab_channel=Migu
+We will apply this theory to Mario and Luigi: Partners In Time where each neural network is an agent playing the copy flower item. The goal is to obtain the optimal agent that can top the speed run example above or destroy the boss in a single copy flower combo string!
 
-use `pyautogui.sleep(0.01)` for registering holds/presses
+## Implementation
 
-dont constantly check for entering characters, have two states, `entered_edge` and `passed_edge`.
+The `main` project script is executed while a Mario and Luigi: Partners In Time game window is open. This project uses an emulator to play the game (which unfortunately means that the game is not running on its original source nor do we have access to in-game data).
 
-- `entered_edge==False` and `passed_eddge==False`: dont do anything
-- `entered_edge==True` and `passed_eddge==False`: wait for last frame until character fully in screen
-- `entered_edge==True` and `passed_eddge==True`: scan for character and mark everything false
+Part of the training for the NEAT algorithm relies on input data, such as sprite positional data and game state data. Since we do not have access to this precise data, another portion of the project heavily relies on computer vision to track every frame on the game window to obtain in-game data for our neural networks.
 
-Roi:
+To outline the requirements for this project, we need:
+- A computer vision algorithm to track game states
+- A NEAT algorithm where each neural network takes in-game data as an input to predict a controller button presses (ex. `A`, `B`, `X`, `Y`, or none).
 
- --------
-| X |    |
-| X |    |
-| X |    |
- --------
+### Computer Vision
 
-note: you dont need to constantly check for both, it works one at a time until both are true. the Xs are the gutter or edge.
+### NEAT
